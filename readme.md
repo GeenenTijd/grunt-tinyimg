@@ -1,8 +1,10 @@
-# [grunt-image](https://npmjs.org/package/grunt-image)
+# grunt-tinyimg
 
 ## About
 
 Optimize PNG, JPEG, SVG images with grunt task. This plugin uses pngquant for png images, mozjpeg for jpegs and svgo for svg files.
+
+The reason this plugin is created is because of most plugins either don't compress the images or are terribly slow. The intention is to have a fast compression plugin without bells and whistles.
 
 ## Install
 
@@ -17,7 +19,7 @@ This is an example of `gruntfile.js`.
 ```js
 module.exports = function (grunt) {
   grunt.initConfig({
-    image: {
+    tinyimg: {
       static: {
         files: { 
           'dist/img.png': 'src/img.png',
