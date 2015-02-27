@@ -4,7 +4,7 @@
 
 Optimize PNG, JPEG, SVG images with grunt task. This plugin uses pngquant for png images, mozjpeg for jpegs and svgo for svg files.
 
-The reason this plugin is created is because of most plugins either don't compress the images or are terribly slow. The intention is to have a fast compression plugin without bells and whistles.
+The reason this plugin is created is because most image optimization plugins either don't compress images decently or are terribly slow in doing so. The intention is to have a fast compression plugin without bells and whistles.
 
 ## Install
 
