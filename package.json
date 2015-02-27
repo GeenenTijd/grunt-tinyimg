@@ -1,0 +1,47 @@
+{
+    "name": "grunt-tinyimg",
+    "version": "0.0.1",
+    "description": "Optimize PNG, JPEG & SVG images.",
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/GeenenTijd/grunt-tinyimg.git"
+    },
+    "author": {
+        "name": "Glenn Geenen",
+        "email": "glenn@geenentijd.be",
+        "web": "http://geenentijd.be"
+    },
+    "license": {
+        "type": "MIT"
+    },
+    "engines": {
+        "node": ">=0.10.0"
+    },
+    "bugs": {
+        "url": "https://github.com/GeenenTijd/grunt-tinyimg/issues"
+    },
+    "homepage": "https://github.com/GeenenTijd/grunt-tinyimg",
+    "dependencies": {
+        "async": "*",
+        "mozjpeg": "*",
+        "pngquant-bin": "*",
+        "svgo": "*",
+        "filesize": "*"
+    },
+    "devDependencies": {
+        "grunt": "*",
+        "grunt-contrib-jshint": "*"
+    },
+    "keywords": [
+        "compress",
+        "minify",
+        "optimize",
+        "image",
+        "tiny",
+        "img",
+        "jpg",
+        "jpeg",
+        "png",
+        "svg",
+        "gruntplugin"]
+}
