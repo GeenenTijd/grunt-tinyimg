@@ -31,7 +31,7 @@ module.exports = function (grunt) {
                 process = jpg(tmpDest, src);
             } else if (extension === '.svg') {
                 grunt.file.copy(src, tmpDest);
-                process = svg(dest);
+                process = svg(tmpDest);
             } else {
                 callback(new Error('Invalid image type.'));
             }
@@ -44,7 +44,7 @@ module.exports = function (grunt) {
                 }
 
                 var oldFile = fs.statSync(src).size;
-                var newFile = fs.statSync(dest).size;
+                var newFile = fs.statSync(tmpDest).size;
                 var savings = Math.floor((oldFile - newFile) / oldFile * 100);
 
                 if (newFile < oldFile) {

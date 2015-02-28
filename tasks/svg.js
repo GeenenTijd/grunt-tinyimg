@@ -2,7 +2,7 @@
 
 module.exports = function (dest) {
     return {
-        cmd: './node_modules/svgo/bin/svgo',
+        cmd: __dirname + '/../node_modules/svgo/bin/svgo',
         args: [dest, dest]
     };
 };
