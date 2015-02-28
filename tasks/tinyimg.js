@@ -6,6 +6,7 @@ module.exports = function (grunt) {
     var async = require('async');
     var fs = require('fs');
     var filesize = require('filesize');
+    var tmp = require('tmp');
 
     var png = require('./png');
     var jpg = require('./jpg');
@@ -17,34 +18,47 @@ module.exports = function (grunt) {
         var dest = file.dest;
 
         var extension = path.extname(file.src).toLowerCase();
-        var process = null;
-        if (extension === '.png') {
-            grunt.file.copy(src, dest);
-            process = png(dest);
-        } else if (extension === '.jpg' || extension === '.jpeg') {
-            process = jpg(dest, src);
-        } else if (extension === '.svg') {
-            grunt.file.copy(src, dest);
-            process = svg(dest);
-        } else {
-            callback(new Error('Invalid image type.'));
-        }
 
-        grunt.util.spawn(process, function (err) {
+        tmp.tmpName({
+            postfix: extension
+        }, function (error, tmpDest) {
 
-            if (err) {
-                grunt.log.warn(src + ' - Failed!');
-                return callback(err);
+            var process = null;
+            if (extension === '.png') {
+                grunt.file.copy(src, tmpDest);
+                process = png(tmpDest);
+            } else if (extension === '.jpg' || extension === '.jpeg') {
+                process = jpg(tmpDest, src);
+            } else if (extension === '.svg') {
+                grunt.file.copy(src, tmpDest);
+                process = svg(dest);
+            } else {
+                callback(new Error('Invalid image type.'));
             }
 
-            var oldFile = fs.statSync(src).size;
-            var newFile = fs.statSync(dest).size;
-            var savings = Math.floor((oldFile - newFile) / oldFile * 100);
+            grunt.util.spawn(process, function (err) {
 
-            grunt.log.writeln('Optimized ' + dest.cyan +
-                ' [saved ' + savings + ' % - ' + filesize(oldFile, 1, false) + ' → ' + filesize(newFile, 1, false) + ']');
+                if (err) {
+                    grunt.log.warn(src + ' - Failed!');
+                    return callback(err);
+                }
 
-            callback();
+                var oldFile = fs.statSync(src).size;
+                var newFile = fs.statSync(dest).size;
+                var savings = Math.floor((oldFile - newFile) / oldFile * 100);
+
+                if (newFile < oldFile) {
+                    grunt.file.copy(tmpDest, dest);
+                } else {
+                    grunt.file.copy(src, dest);
+                }
+
+                grunt.log.writeln('Optimized ' + dest.cyan +
+                    ' [saved ' + savings + ' % - ' + filesize(oldFile, 1, false) + ' → ' + filesize(newFile, 1, false) + ']');
+
+                callback();
+            });
+
         });
     }
 
