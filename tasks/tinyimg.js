@@ -1,16 +1,19 @@
 'use strict';
 
+var path = require('path');
+var async = require('async');
+var fs = require('fs');
+var filesize = require('filesize');
+var tmp = require('tmp');
+
+var png = require('./png');
+var jpg = require('./jpg');
+var SVGO = require('svgo');
+
 module.exports = function (grunt) {
 
-    var path = require('path');
-    var async = require('async');
-    var fs = require('fs');
-    var filesize = require('filesize');
-    var tmp = require('tmp');
-
-    var png = require('./png');
-    var jpg = require('./jpg');
-    var svg = require('./svg');
+    var svgo = new SVGO({});
+    var total = 0;
 
     function optimizeFile(file, callback) {
 
@@ -23,23 +26,11 @@ module.exports = function (grunt) {
             postfix: extension
         }, function (error, tmpDest) {
 
-            var process = null;
-            if (extension === '.png') {
-                grunt.file.copy(src, tmpDest);
-                process = png(tmpDest);
-            } else if (extension === '.jpg' || extension === '.jpeg') {
-                process = jpg(tmpDest, src);
-            } else if (extension === '.svg') {
-                grunt.file.copy(src, tmpDest);
-                process = svg(tmpDest);
-            } else {
-                callback(new Error('Invalid image type.'));
-            }
-
-            grunt.util.spawn(process, function (err) {
+            var next = function (err) {
 
                 if (err) {
-                    grunt.log.warn(src + ' - Failed!');
+                    grunt.file.copy(src, dest);
+                    grunt.log.writeln('Skipped ' + dest.cyan + ' [no savings]');
                     return callback(err);
                 }
 
@@ -48,6 +39,7 @@ module.exports = function (grunt) {
                 var savings = Math.floor((oldFile - newFile) / oldFile * 100);
 
                 if (newFile < oldFile) {
+                    total += oldFile - newFile;
                     grunt.file.copy(tmpDest, dest);
                     grunt.log.writeln('Optimized ' + dest.cyan +
                         ' [saved ' + savings + ' % - ' + filesize(oldFile, 1, false) + ' → ' + filesize(newFile, 1, false) + ']');
@@ -57,8 +49,25 @@ module.exports = function (grunt) {
                 }
 
                 callback();
-            });
+            };
 
+            if (extension === '.png') {
+                grunt.file.copy(src, tmpDest);
+                grunt.util.spawn(png(tmpDest), next);
+            } else if (extension === '.jpg' || extension === '.jpeg') {
+                grunt.util.spawn(jpg(tmpDest, src), next);
+            } else if (extension === '.svg') {
+                fs.readFile(src, 'utf8', function (err, data) {
+                    if (err) {
+                        next(err);
+                    }
+                    svgo.optimize(data, function (result) {
+                        fs.writeFile(tmpDest, result, next);
+                    });
+                });
+            } else {
+                callback(new Error('Invalid image type.'));
+            }
         });
     }
 
@@ -66,13 +75,18 @@ module.exports = function (grunt) {
 
         var queue = async.queue(optimizeFile, 4);
 
-        queue.drain = callback;
+        queue.drain = function () {
+
+            grunt.log.writeln('Total savings: ' + filesize(total, 1, false).green);
+
+            callback();
+        };
 
         gruntFiles.forEach(function (f) {
             var dest = f.dest;
             var files = f.src.filter(function (filepath) {
                 if (!grunt.file.exists(filepath)) {
-                    grunt.log.warn('Source file "' + filepath + '" not found.');
+                    grunt.log.warn('\nSource file "' + filepath + '" not found.');
                     return false;
                 } else {
                     return true;
