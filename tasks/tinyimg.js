@@ -49,12 +49,12 @@ module.exports = function (grunt) {
 
                 if (newFile < oldFile) {
                     grunt.file.copy(tmpDest, dest);
+                    grunt.log.writeln('Optimized ' + dest.cyan +
+                        ' [saved ' + savings + ' % - ' + filesize(oldFile, 1, false) + ' → ' + filesize(newFile, 1, false) + ']');
                 } else {
                     grunt.file.copy(src, dest);
+                    grunt.log.writeln('Skipped ' + dest.cyan + ' [no savings]');
                 }
-
-                grunt.log.writeln('Optimized ' + dest.cyan +
-                    ' [saved ' + savings + ' % - ' + filesize(oldFile, 1, false) + ' → ' + filesize(newFile, 1, false) + ']');
 
                 callback();
             });
