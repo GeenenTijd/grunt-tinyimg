@@ -1,6 +1,6 @@
 {
   "name": "grunt-tinyimg",
-  "version": "0.0.7",
+  "version": "1.0.0",
   "description": "Optimize PNG, JPEG & SVG images.",
   "repository": {
     "type": "git",
@@ -24,8 +24,8 @@
   "dependencies": {
     "async": "^1.4.0",
     "filesize": "^3.1.3",
-    "mozjpeg": "^3.0.0",
-    "pngquant-bin": "^2.0.3",
+    "mozjpeg": "^4.0.0",
+    "pngquant-bin": "^3.0.0",
     "svgo": "^0.5.3",
     "tmp": "^0.0.26"
   },
