@@ -62,7 +62,10 @@ module.exports = function (grunt) {
                         next(err);
                     }
                     svgo.optimize(data, function (result) {
-                        fs.writeFile(tmpDest, result, next);
+                        if (result.error) {
+                          return next(new Error(result.error));
+                        }
+                        fs.writeFile(tmpDest, result.data, next);
                     });
                 });
             } else {
